@@ -8,10 +8,10 @@
 - [Workflow](#workflow)
 
 ## Introduction
-This software was built as part of my workflow to turn sprites into sprite sheets for the purposes of animating them in the Godot game engine. This tool is part of my workflow for getting art from the UO client to being animated in the Godot engine using a custom animation player.  
+This software was built as part of my workflow to turn sprites into sprite sheets for the purpose of animating them in the Godot game engine. This tool is part of my workflow for getting art from the UO client to being animated in the Godot engine using a custom animation player.  
 
-Given the correct meta data about each sprite we can animate, layer, and hue weapons, armor, clothing, and mobiles in a way that mimics the UO client while providing more freedom for future growth.
-Primarily tested down my desired work flow path. Email Contact at phildoes.dev for feedback.
+Given the correct meta data about each sprite, we can animate, layer, and hue weapons, armor, clothing, and mobiles in a way that mimics the UO client while providing more freedom for future growth.
+Primarily tested down my desired workflow path. Email Contact at phildoes.dev for feedback.
 
 ## Requirements
 Written in Python 3.11  
@@ -22,7 +22,7 @@ Utilizes several open source Python packages
 
 ## The Tool
 Home Tab  
-![image](https://github.com/user-attachments/assets/8ed0585c-686c-4132-8a37-54fe94a0ae75)
+![image](_ReadmeAssets/Home_Combined.png)
   - A
     - The name of the output sprite sheet. Meta data files will hold a reference to this name
     - Defaults to the name of the selected folder to increase speed of workflow
@@ -37,7 +37,7 @@ Home Tab
     - Invented to process a great number of folders containing sprites at once, allowing me to convert without having to choose each folder individually
 
 Input/Output Tab  
-![image](https://github.com/user-attachments/assets/cf98433e-f33a-4dc3-a0a2-7167ac02052f)
+![image](_ReadmeAssets/InputOutput_Combined.png)
   - A
     - Output file type of the sprite sheet to be created. 
     - Currently PNG vs BMP, implicitly implies a desire for transparency or not
@@ -55,7 +55,7 @@ Input/Output Tab
       - Sprite size does not always match tile size, so it is useful to draw this green bounding box around the actual sprite. Allows users to verify positioning for debugging purposes
 
 Sprite Tab  
-![image](https://github.com/user-attachments/assets/9cbc6b7c-48d6-488c-b1ce-2e9ece4aa578)
+![image](_ReadmeAssets/Sprite_Combined.png)
   - A
     - The software gives the user the ability to choose how much meta data they want to include in the sprite name. The more information included, the more options available.
       - For example, we cannot apply offset or export it as meta data if it is not included.
@@ -69,14 +69,14 @@ Sprite Tab
   - C
     - "Tile Size" can be 'Auto-Calculated' based on max sprite sizes and offsets, or set manually, which allows the user to create consistent tiles/sprites across sprite sheets
   - D
-    - Default alignment of a sprite within a tile. A tile has to be large enough to contain all sprite sizes, so any sprite smaller than the tile will be initially aligned w/in the tile at some location. This setting allows users to choose between: N, NE, E, SE, S, etc.
+    - Default alignment of a sprite within a tile. A tile must be large enough to contain all sprite sizes, so any sprite smaller than the tile will be initially aligned w/in the tile at some location. This setting allows users to choose between: N, NE, E, SE, S, etc.
   - E
     - An error occurs if a sprite draws over a tile's border. We can choose to ignore this error
   - F
     - Sometimes it is nice to delete the sprites after we are done working on them, and sometimes it is desirable to keep them. This gives the user that choice.
 
 Sprite Sheet Tab  
-![image](https://github.com/user-attachments/assets/89ae8c6d-ea91-478c-a51b-1133c88e5d7d)
+![image](_ReadmeAssets/SpriteSheet_Combined.png)
   - A
     - Forces row count to equal column count, making a square sprite sheet
   - B
