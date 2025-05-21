@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 import os
+import datetime
 
 from TabGroups.HomeTab import HomeTab
 from TabGroups.InputOutputTab import InputOutputTab
@@ -154,22 +155,88 @@ class SpriteToSpriteSheet:
             return
         self.MakeSpriteSheetObj.request_sprite_sheet()
 
-
     def request_create_ss_recursive(self, e):
+        """
+        All of this should be factored out into its own class, away from the UI.
+        Same with the file mgmt of 'create ss'.
+        :param e:
+        :return:
+        """
         self.save_settings_to_state_file("")
         print("Create SS Requested - Recursive")
         settings = self.get_settings_from_tabs()
 
+        # Consider rec. output options
+        rec_summary_output_data = []
+        is_create_rec_summary_output = False  # internal flag
+        # Create summary folder if there are options selected that require it
+        if settings["InputOutputTabSettings"]["CreateRecursiveCopySSToSummaryFolder"] or settings["InputOutputTabSettings"]["CreateRecursiveCompileSummaryFile"]:
+            settings["CreateRecursiveSettings"] = {
+                "SummaryFolderDir": self.get_create_ss_recursive_summary_folder(settings),
+            }
+            is_create_rec_summary_output = True
+
         contents_of_dir = os.scandir(settings["HomeTabSettings"]["DirWorkingFolderPath"])
+        error_counter = 0
         for _f in contents_of_dir:
             if _f.is_dir():
+                # ignore our summary folder
+                if _f.name == self.get_create_ss_recursive_summary_folder(settings=None, folder_name_only=True):
+                    continue
+                # Reset working directories to be the current folder
                 settings["HomeTabSettings"]["DirWorkingFolderPath"] = _f.path
                 settings["HomeTabSettings"]["BaseFileOutName"] = _f.name
+                # if applying the settings fails it means there was something wrong with the folders or they were empty. Usually empty.
                 has_files = self.MakeSpriteSheetObj.apply_current_settings(settings)
                 if not has_files:
-                    self.MakeSpriteSheetObj.log_to_user("\nNo files to process in directory, no work to do.\n")
-                    return
+                    self.MakeSpriteSheetObj.log_to_user("\nNo files to process in directory, no work to do. Skipping.\n")
+                    error_counter += 1
+                    continue
                 self.MakeSpriteSheetObj.request_sprite_sheet()
+
+                # After we've applied settings we can compile a summary for this sprite sheet
+                if is_create_rec_summary_output:
+                    ss_summary = self.MakeSpriteSheetObj.get_file_summary()
+                    out_json = {
+                        "Name": self.MakeSpriteSheetObj.get_output_filename(append_ext=False),
+                        "SheetID": ss_summary["SheetID"],
+                        "TotalAnimations": len(ss_summary["AnimationSummaries"].keys()),
+                        # "TotalTiles": ss_summary["TotalUsedTiles"],
+                        # "TileRows_Cols": (ss_summary["Rows"], ss_summary["Columns"]),
+                    }
+                    rec_summary_output_data.append(out_json)
+
+        # once we have finished touching all folders we cna output our summary file
+        if is_create_rec_summary_output:
+            self.output_creat_rec_summary_file(rec_summary_output_data, settings["CreateRecursiveSettings"]["SummaryFolderDir"])
+        self.MakeSpriteSheetObj.log_to_user("\n\n--------------\n")
+        self.MakeSpriteSheetObj.log_to_user(f"\tTotal Errors: {error_counter}.\n")
+
+    def get_create_ss_recursive_summary_folder(self, settings, folder_name_only=False):
+        output_folder_name = "_RecursiveSS_SummaryFolder"
+        if folder_name_only:
+            return output_folder_name
+        output_dir = f'{settings["HomeTabSettings"]["DirWorkingFolderPath"]}/{output_folder_name}/'
+        if not os.path.isdir(output_dir):
+            os.mkdir(output_dir)
+        return output_dir
+
+    def output_creat_rec_summary_file(self, summary_data, recursive_summary_output_dir):
+        output_path = recursive_summary_output_dir + "/_Create_Rec_SpriteSheet_Summary.txt"
+        with open(output_path, "wt") as f:
+            dt_string = (datetime.datetime.now()).strftime("%d/%m/%Y %H:%M:%S")
+            f.write("___ Create Sprite Sheet Rec. Summary ___\n")
+            f.write(f"\tCreated: {dt_string}\n")
+
+            f.write("\n\n___ SS Summaries ___\n\n")
+            f.write("[\n")
+            for summary in summary_data:
+                f.write(f"\t {summary}, \n")
+            f.write("]\n")
+
+
+
+
 
 if __name__ == "__main__":
     SpriteToSheetObj = SpriteToSpriteSheet()

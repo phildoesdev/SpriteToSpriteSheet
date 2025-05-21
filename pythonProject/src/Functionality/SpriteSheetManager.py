@@ -2,6 +2,7 @@ from PIL import Image, ImageDraw, ImageFont
 import os
 import datetime, time
 import json
+import shutil
 
 from Functionality.SpriteSummaryContainers import SpriteWorkingFolderInfo, SpriteFileInfo, SpriteSheetInfo, FileNameFormat
 
@@ -186,27 +187,21 @@ class SpriteSheetManager:
                     ss_master_draw.line(bound_box_two, fill="Green", width=1)
 
             # Prepare to save sprite sheet
-            save_path = self.get_output_dir()
-
-            save_path += self.get_output_filename(is_master=is_master)
+            save_path = self.get_output_dir() + self.get_output_filename(is_master=is_master)
             sprite_sheet.save(save_path)
+
+            # If this is a 'create recursive SS' request we might want to output a copy of our sprite sheet somewhere else
+            if "CreateRecursiveSettings" in self.current_settings.keys():
+                if (not is_master and self.current_settings["InputOutputTabSettings"]["CreateRecursiveCopySSToSummaryFolder"]) or (is_master and self.current_settings["InputOutputTabSettings"]["CreateRecursiveCopyMasterSSToSummaryFolder"]):
+                    copy_save_path = self.current_settings["CreateRecursiveSettings"]["SummaryFolderDir"] + self.get_output_filename(is_master=is_master)
+                    sprite_sheet.save(copy_save_path)
+
             additional_log_out_txt = ""
             if is_master:
                 additional_log_out_txt = "Master "
 
             self.log_to_user_mthd(f"\n{additional_log_out_txt}Sprite Sheet Saved to: \n\t[{save_path}]")
             return save_path
-
-    def create_master_sheet(self, ss_path):
-        self.current_ss_info = SpriteSheetInfo(self.current_settings, self.current_folder_summary)
-        with Image.open(ss_path, formats=(self.current_settings["InputOutputTabSettings"]["OutFileType"],)) as master_ss:
-            ss_draw = ImageDraw.Draw(master_ss)
-            # hard coded font for now
-
-            for spritefile in self.current_file_list:
-                # Draw in the section we want
-                # would also be nice to be able to choose font size on the gui
-                pass
 
     def create_summary_file(self):
         # Only create it if the people want it
@@ -221,6 +216,12 @@ class SpriteSheetManager:
         output_filename = self.get_output_filename(append_ext=False) + "_meta.json"
         with open(outputdir+output_filename, "wt") as f:
             f.write(json.dumps(file_out))
+
+        # If requested we'll make a copy of this file to the rec. summary folder
+        if "CreateRecursiveSettings" in self.current_settings.keys() and self.current_settings["InputOutputTabSettings"]["CreateRecursiveCopyOutputSummaryFile"]:
+            copy_save_path = self.current_settings["CreateRecursiveSettings"]["SummaryFolderDir"] + output_filename
+            shutil.copyfile(outputdir+output_filename, copy_save_path)
+
         self.log_to_user_mthd(f"\nSummary File Written To: \n\t{outputdir+output_filename}")
 
         # We need to create a human-readable version of our summary file as well if requested
@@ -229,7 +230,7 @@ class SpriteSheetManager:
             output_filename = self.get_output_filename(append_ext=False) + "_summary.txt"
             with open(outputdir+output_filename, "wt") as f:
                 f.write("___Sprite Sheet Summary___\n")
-                f.write(f"\tName : {file_out['SheetName']}\n")
+                f.write(f"\tName : {self.get_output_filename(append_ext=False)}\n")
                 f.write(f"\tSS Name : {self.get_output_filename()}\n")
                 f.write(f"\tCreated : {dt_string}\n")
                 if file_out['SheetID'] != 0:
@@ -275,6 +276,11 @@ class SpriteSheetManager:
                     f.write("\t}")
                     f.write("\n\n")
             self.log_to_user_mthd(f"\nSummary File Written To: \n\t{outputdir+output_filename}")
+
+            # If requested do a copy out to the summary folder of this human-readable file
+            if "CreateRecursiveSettings" in self.current_settings.keys() and self.current_settings["InputOutputTabSettings"]["CreateRecursiveCopyOutputSummaryFile"]:
+                copy_save_path = self.current_settings["CreateRecursiveSettings"]["SummaryFolderDir"] + output_filename
+                shutil.copyfile(outputdir+output_filename, copy_save_path)
 
     def get_file_summary(self):
         # Begin building our file
@@ -371,16 +377,23 @@ class SpriteSheetManager:
             animation_summary_out_dict[animation_id]["FramesPerDirection"] = animation_summary_dict[animation_id]["max_frames_per_direction"]
         return animation_summary_out_dict
 
-
         # Current setting struct
 
+        #   Only exists on recursive calls...
+        # self.current_settings["CreateRecursiveSettings"]["SummaryFolderDir"]
+
         # self.current_settings["HomeTabSettings"]["BaseFileOutName"]
+        # self.current_settings["HomeTabSettings"]["DirWorkingFolderPath"]
 
         # self.current_settings["InputOutputTabSettings"]["DirWorkingFolderPath"]
         # self.current_settings["InputOutputTabSettings"]["OutFileType"]
         # self.current_settings["InputOutputTabSettings"]["OutputSummaryTextCheck"]
         # self.current_settings["InputOutputTabSettings"]["OutputHumanReadableSummaryFileCheck"]
         # self.current_settings["InputOutputTabSettings"]["OutputMasterFileCheck"]
+        # self.current_settings["InputOutputTabSettings"]["CreateRecursiveCopySSToSummaryFolder"]
+        # self.current_settings["InputOutputTabSettings"]["CreateRecursiveCopyOutputSummaryFile"]
+        # self.current_settings["InputOutputTabSettings"]["CreateRecursiveCompileSummaryFile"]
+
 
         # self.current_settings["InputOutputTabSettings"]["DrawBoundingBoxCheck"]
         # self.current_settings["InputOutputTabSettings"]["DrawSpriteBoundingBoxCheck"]

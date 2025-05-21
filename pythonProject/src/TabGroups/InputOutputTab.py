@@ -18,6 +18,12 @@ class InputOutputTab:
     DrawBoundingBoxCheck = None
     DrawSpriteBoundingBoxCheck = None
 
+    # Create Recursive Options
+    CreateRecursiveCopySSToSummaryFolder = None
+    CreateRecursiveCopyMasterSSToSummaryFolder = None
+    CreateRecursiveCopyOutputSummaryFile = None
+    CreateRecursiveCompileSummaryFile = None
+
     # Master File Font Color
     MasterFileFontColorR = None
     MasterFileFontColorG = None
@@ -46,7 +52,15 @@ class InputOutputTab:
         self.DrawSpriteBoundingBoxCheck = IntVar()
         self.DrawSpriteBoundingBoxCheck.set(False)
 
-
+        # Create Recursive Options
+        self.CreateRecursiveCopySSToSummaryFolder = IntVar()
+        self.CreateRecursiveCompileSummaryFile = IntVar()
+        self.CreateRecursiveCopyMasterSSToSummaryFolder = IntVar()
+        self.CreateRecursiveCopyOutputSummaryFile = IntVar()
+        self.CreateRecursiveCopySSToSummaryFolder.set(True)
+        self.CreateRecursiveCompileSummaryFile.set(True)
+        self.CreateRecursiveCopyMasterSSToSummaryFolder.set(True)
+        self.CreateRecursiveCopyOutputSummaryFile.set(True)
 
         # Font RGB Selection
         self.MasterFileFontColorR = IntVar()
@@ -74,11 +88,13 @@ class InputOutputTab:
         fileInfoFrame = ttk.Frame(outputFrame)
         fileAdditionalOutputsFrame = ttk.LabelFrame(outputFrame, text="Additional Output Files")
         fileAdditionalSettingsFrame = ttk.LabelFrame(outputFrame, text="Additional Settings")
+        fileRecursiveOutputSettings = ttk.LabelFrame(outputFrame, text="Recursive Output Options")
         # masterFileFontFrame = ttk.LabelFrame(outputFrame, text="Master File Font Options")
 
         fileInfoFrame.grid(column=0, row=0, columnspan=1, rowspan=1, sticky="w")
         fileAdditionalOutputsFrame.grid(column=0, row=2, columnspan=1, rowspan=1, sticky="w", pady=10)
         fileAdditionalSettingsFrame.grid(column=0, row=3, columnspan=1, rowspan=1, sticky="w", pady=10)
+        fileRecursiveOutputSettings.grid(column=0, row=4, columnspan=1, rowspan=1, sticky="w", pady=10)
         # masterFileFontFrame.grid(column=0, row=3, columnspan=1, rowspan=1, sticky="w", ipady=10, ipadx=10)
 
         # Filetype combobox
@@ -102,6 +118,23 @@ class InputOutputTab:
         drawSpriteBoundBoxCheck = ttk.Checkbutton(fileAdditionalSettingsFrame, variable=self.DrawSpriteBoundingBoxCheck, text="Draw Bounding Box On Sprite")
         drawBoundBoxCheck.grid(column=0, row=0, columnspan=1, rowspan=1, sticky="w")
         drawSpriteBoundBoxCheck.grid(column=0, row=1, columnspan=1, rowspan=1, sticky="w")
+
+
+        # Create Recursive Options
+        copySSToSummaryFolderBoxCheck = ttk.Checkbutton(fileRecursiveOutputSettings, variable=self.CreateRecursiveCopySSToSummaryFolder, text="Copy SS To summary folder")
+        copyMasterSSToSummaryFolderBoxCheck = ttk.Checkbutton(fileRecursiveOutputSettings, variable=self.CreateRecursiveCopyMasterSSToSummaryFolder, text="Copy Master SS to summary folder")
+        copyOutputSummaryFileBoxCheck = ttk.Checkbutton(fileRecursiveOutputSettings, variable=self.CreateRecursiveCopyOutputSummaryFile, text="Copy Summary File to summary folder")
+        compileSummaryFileBoxCheck = ttk.Checkbutton(fileRecursiveOutputSettings, variable=self.CreateRecursiveCompileSummaryFile, text="Compile summary file")
+
+        copySSToSummaryFolderBoxCheck.grid(column=0, row=0, columnspan=1, rowspan=1, sticky="w")
+        copyMasterSSToSummaryFolderBoxCheck.grid(column=0, row=1, columnspan=1, rowspan=1, sticky="w")
+        copyOutputSummaryFileBoxCheck.grid(column=0, row=2, columnspan=1, rowspan=1, sticky="w")
+        compileSummaryFileBoxCheck.grid(column=0, row=3, columnspan=1, rowspan=1, sticky="w")
+
+        # fileRecursiveOutputSettings
+        #   Create Copies of SS in Summary Folder
+        #   Compile SS recursive summary file in Summary Folder
+
 
 
         # Color Chooser
@@ -154,6 +187,11 @@ class InputOutputTab:
             "OutputMasterFileCheck": self.OutputMasterFileCheck.get(),
             "DrawBoundingBoxCheck": self.DrawBoundingBoxCheck.get(),
             "DrawSpriteBoundingBoxCheck": self.DrawSpriteBoundingBoxCheck.get(),
+            "CreateRecursiveCopySSToSummaryFolder": self.CreateRecursiveCopySSToSummaryFolder.get(),
+            "CreateRecursiveCopyMasterSSToSummaryFolder": self.CreateRecursiveCopyMasterSSToSummaryFolder.get(),
+            "CreateRecursiveCompileSummaryFile": self.CreateRecursiveCompileSummaryFile.get(),
+            "CreateRecursiveCopyOutputSummaryFile": self.CreateRecursiveCopyOutputSummaryFile.get(),
+
             # "MasterFileFontColorR": self.MasterFileFontColorR.get(),
             # "MasterFileFontColorG": self.MasterFileFontColorG.get(),
             # "MasterFileFontColorB": self.MasterFileFontColorB.get(),
@@ -168,7 +206,10 @@ class InputOutputTab:
             self.OutputMasterFileCheck.set(settings["OutputMasterFileCheck"])
             self.DrawBoundingBoxCheck.set(settings["DrawBoundingBoxCheck"])
             self.DrawSpriteBoundingBoxCheck.set(settings["DrawSpriteBoundingBoxCheck"])
-
+            self.CreateRecursiveCopySSToSummaryFolder.set(settings["CreateRecursiveCopySSToSummaryFolder"])
+            self.CreateRecursiveCopyMasterSSToSummaryFolder.set(settings["CreateRecursiveCopyMasterSSToSummaryFolder"])
+            self.CreateRecursiveCompileSummaryFile.set(settings["CreateRecursiveCompileSummaryFile"])
+            self.CreateRecursiveCopyOutputSummaryFile.set(settings["CreateRecursiveCopyOutputSummaryFile"])
             # self.MasterFileFontColorR.set(settings["MasterFileFontColorR"])
             # self.MasterFileFontColorG.set(settings["MasterFileFontColorG"])
             # self.MasterFileFontColorB.set(settings["MasterFileFontColorB"])
